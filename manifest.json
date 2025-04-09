@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Character Counter",
+  "version": "1.0",
+  "description": "Counts characters on a webpage and tracks growth",
+  "permissions": ["activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  
+  "action": {
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}
