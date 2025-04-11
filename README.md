@@ -3,20 +3,22 @@
 A Microsoft Edge extension that counts characters on a webpage and displays the total in a tooltip.
 
 ## Features
-- Click the icon to count characters on the active tab.
-- Displays approximate count on the badge (e.g., "1k" for 1000+ characters).
-- Shows exact count in the tooltip after a 2-second delay.
-- Works across tabs, updating for the current active tab.
+- Empty badge in new tabs.
+- First click: Starts counting (2s delay), updates every minute.
+- Second click: Shows immediate count.
+- Auto-updates on page changes within the tab.
+- Badge: "N/A" on restricted pages, otherwise approximate count (e.g., "1k").
+- Tooltip: Exact total and auto status.
 
 ## Installation
-1. Navigate to the `CharacterCounter/` folder in this repository.
+1. Clone or download this repository.
 2. Open Edge → "Extensions" → Enable "Developer mode".
 3. Click "Load unpacked" and select this folder.
 
 ## Files
 - `manifest.json`: Extension configuration.
-- `background.js`: Logic for counting and updating the badge/tooltip.
+- `background.js`: Logic for counting and updating.
 - `icon*.png`: Icons for the extension.
 
 ## Credits
-Created with the assistance of Grok by xAI.
+Created by Kulver-stukas with assistance from Grok by xAI.

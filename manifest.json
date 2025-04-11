@@ -2,12 +2,11 @@
   "manifest_version": 3,
   "name": "Character Counter",
   "version": "1.0",
-  "description": "Counts characters on a webpage and tracks growth",
-  "permissions": ["activeTab", "scripting"],
+  "description": "Counts characters on a webpage with tooltip display",
+  "permissions": ["activeTab", "scripting", "storage", "alarms"],
   "background": {
     "service_worker": "background.js"
   },
-  
   "action": {
     "default_icon": {
       "16": "icon16.png",
