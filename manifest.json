@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Character Counter",
-  "version": "1.6",
+  "version": "1.10",
   "description": "Counts characters on a webpage with tooltip display",
-  "permissions": ["activeTab", "scripting", "storage", "alarms"],
+  "permissions": ["scripting", "storage", "alarms", "webNavigation"],
+  "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "background.js"
   },
