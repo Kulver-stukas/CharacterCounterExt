@@ -20,7 +20,7 @@ A lightweight Microsoft Edge extension that counts characters on any webpage and
 - Created by Kulver-stukas (project lead).
 - Developed with assistance from Grok by xAI.
 
-**Version:** 1.12
+**Version:** 1.12.1
 
 =================================================================================
 
@@ -50,4 +50,4 @@ A lightweight Microsoft Edge extension that counts characters on any webpage and
 - Создано Kulver-stukas (руководитель проекта).
 - Разработано при содействии Grok by xAI.
 
-**Версия:** 1.12
+**Версия:** 1.12.1

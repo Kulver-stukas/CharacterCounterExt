@@ -12,13 +12,11 @@ function formatBadgeText(count) {
 function updateBadgeAndTooltip(tabId) {
   console.log("Function called - Tab:", tabId);
 
-  // Получаем информацию о вкладке
+  // Проверяем существование вкладки
   chrome.tabs.get(tabId, (tab) => {
-    if (chrome.runtime.lastError || !tab.url || tab.status !== "complete") {
-      console.log("No valid tab, URL, or tab not ready, setting N/A");
-      chrome.action.setBadgeText({ text: "N/A", tabId: tabId });
-      chrome.action.setTitle({ title: "Character Counter: N/A", tabId: tabId });
-      return;
+    if (chrome.runtime.lastError || !tab || !tab.url || tab.status !== "complete") {
+      console.log("Tab not found, no URL, or not ready, skipping:", tabId, chrome.runtime.lastError?.message);
+      return; // Пропускаем, не устанавливая ничего
     }
 
     // Проверяем, доступен ли URL
@@ -26,6 +24,7 @@ function updateBadgeAndTooltip(tabId) {
     if (
       url.protocol === "chrome:" ||
       url.protocol === "about:" ||
+      url.protocol === "edge:" ||
       tab.url.includes("yandex.ru/chrome/newtab")
     ) {
       console.log("Restricted page, setting N/A:", tab.url);
@@ -39,8 +38,8 @@ function updateBadgeAndTooltip(tabId) {
       target: { tabId: tabId },
       func: () => document.body.innerText?.length || 0
     }, (results) => {
-      if (chrome.runtime.lastError) {
-        console.error("Script error:", chrome.runtime.lastError.message);
+      if (chrome.runtime.lastError || !results || !results[0]) {
+        console.error("Script error or no results:", chrome.runtime.lastError?.message);
         chrome.action.setBadgeText({ text: "N/A", tabId: tabId });
         chrome.action.setTitle({ title: "Character Counter: N/A", tabId: tabId });
         return;
@@ -77,7 +76,7 @@ chrome.webNavigation.onCompleted.addListener((details) => {
   if (details.frameId === 0) { // Только основной фрейм
     updateBadgeAndTooltip(details.tabId);
   }
-});
+}, { url: [{ schemes: ["http", "https"] }] }); // Ограничиваем только http/https
 
 // Периодическое обновление каждые 5 секунд
 chrome.alarms.create("updateBadge", { periodInMinutes: 5 / 60 });
@@ -94,10 +93,16 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 // Восстановление последнего значения при загрузке
 chrome.storage.local.get("lastCount", (data) => {
   if (data.lastCount?.tabId) {
-    const count = data.lastCount.count;
-    const displayText = formatBadgeText(count);
-    console.log("Restoring last count:", displayText);
-    chrome.action.setBadgeText({ text: displayText, tabId: data.lastCount.tabId });
-    chrome.action.setTitle({ title: `Character Counter: ${count}`, tabId: data.lastCount.tabId });
+    chrome.tabs.get(data.lastCount.tabId, (tab) => {
+      if (chrome.runtime.lastError || !tab) {
+        console.log("Tab for lastCount not found, skipping:", data.lastCount.tabId);
+        return;
+      }
+      const count = data.lastCount.count;
+      const displayText = formatBadgeText(count);
+      console.log("Restoring last count:", displayText);
+      chrome.action.setBadgeText({ text: displayText, tabId: data.lastCount.tabId });
+      chrome.action.setTitle({ title: `Character Counter: ${count}`, tabId: data.lastCount.tabId });
+    });
   }
 });
