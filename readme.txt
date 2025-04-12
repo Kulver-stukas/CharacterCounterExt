@@ -12,7 +12,7 @@ A lightweight Microsoft Edge extension that counts characters on any webpage and
 - Minimal performance impact on your browser.
 
 **How to Use:**
-1. Install the extension from Edge Add-ons.
+1. Install the extension from Edge/Chrome Add-ons (Manage extensions → Load unpacked).
 2. Open any webpage, and the character count will appear on the extension badge.
 3. Hover over the badge to see the exact count in the tooltip.
 
@@ -20,7 +20,7 @@ A lightweight Microsoft Edge extension that counts characters on any webpage and
 - Created by Kulver-stukas (project lead).
 - Developed with assistance from Grok by xAI.
 
-**Version:** 1.11
+**Version:** 1.12
 
 =================================================================================
 
@@ -42,7 +42,7 @@ A lightweight Microsoft Edge extension that counts characters on any webpage and
 - Минимальное влияние на производительность вашего браузера.
 
 **Как использовать:**
-1. Установите расширение из надстроек Edge.
+1. Установите расширение из надстроек Edge/Chrome ("Расширения" → "Загрузить распакованное расширение".).
 2. Откройте любую веб-страницу, и количество символов отобразится на значке расширения.
 3. Наведите курсор на значок, чтобы увидеть точное количество в подсказке.
 
@@ -50,4 +50,4 @@ A lightweight Microsoft Edge extension that counts characters on any webpage and
 - Создано Kulver-stukas (руководитель проекта).
 - Разработано при содействии Grok by xAI.
 
-**Версия:** 1.11
+**Версия:** 1.12
