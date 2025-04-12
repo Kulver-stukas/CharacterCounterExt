@@ -1,15 +1,6 @@
-function updateBadgeAndTooltip(tabId, initial = false) {
-  console.log("Function called - Tab:", tabId, "Initial:", initial);
+function updateBadgeAndTooltip(tabId) {
+  console.log("Function called - Tab:", tabId);
   
-  if (initial) {
-    console.log("Setting initial title");
-    chrome.action.setTitle({
-      title: "Character Counter\nChecking site access...",
-      tabId: tabId
-    });
-    return;
-  }
-
   console.log("Executing script");
   chrome.scripting.executeScript({
     target: { tabId: tabId },
@@ -31,75 +22,63 @@ function updateBadgeAndTooltip(tabId, initial = false) {
       console.log("Result - Total:", total, "Badge:", badgeText);
       chrome.action.setBadgeText({ text: badgeText, tabId: tabId });
       chrome.action.setBadgeBackgroundColor({ color: "#666" });
-      chrome.storage.local.get(["isCounting"], (data) => {
-        const isCounting = data.isCounting || false;
-        chrome.action.setTitle({
-          title: `Character Counter\nTotal: ${total}\nAuto: ${isCounting ? "On" : "Off"}`,
-          tabId: tabId
-        });
+      chrome.action.setTitle({
+        title: `Character Counter\nTotal: ${total}`,
+        tabId: tabId
       });
-      chrome.storage.local.set({ lastCount: badgeText }); // Сохраняем последнее значение
+      chrome.storage.local.set({ lastCount: badgeText });
     }
   });
 }
 
-// Восстановление значка при загрузке страницы
+// Восстановление значка
 function restoreBadge(tabId) {
-  chrome.storage.local.get(["isCounting", "lastCount"], (data) => {
-    const isCounting = data.isCounting || false;
+  chrome.storage.local.get(["lastCount"], (data) => {
     const lastCount = data.lastCount || "";
-    if (isCounting && lastCount) {
+    if (lastCount) {
       console.log("Restoring badge - Tab:", tabId, "Last count:", lastCount);
       chrome.action.setBadgeText({ text: lastCount, tabId: tabId });
       chrome.action.setBadgeBackgroundColor({ color: "#666" });
       chrome.action.setTitle({
-        title: `Character Counter\nCounting...\nAuto: On`,
+        title: "Character Counter\nCounting...",
         tabId: tabId
       });
     }
   });
 }
 
-chrome.action.onClicked.addListener((tab) => {
-  if (!tab.id) {
-    console.error("No valid tab ID");
-    return;
-  }
-
-  console.log("Click event triggered - Tab:", tab.id);
-  chrome.storage.local.get(["isCounting"], (data) => {
-    const isCounting = data.isCounting || false;
-    console.log("Counting state:", isCounting);
-
-    if (!isCounting) {
-      console.log("First click - Starting count");
-      chrome.storage.local.set({ isCounting: true });
-      updateBadgeAndTooltip(tab.id, true);
-      
-      setTimeout(() => {
-        console.log("First count after delay");
-        updateBadgeAndTooltip(tab.id, false);
-      }, 2000);
-
-      chrome.alarms.create("autoUpdate", { periodInMinutes: 1 });
-    } else {
-      console.log("Second click - Immediate count");
-      updateBadgeAndTooltip(tab.id, false);
+// Старт подсчета для активной вкладки
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].id) {
+      console.log("Starting count on install - Tab:", tabs[0].id);
+      updateBadgeAndTooltip(tabs[0].id);
+      chrome.alarms.create("autoUpdate", { periodInMinutes: 5 / 60 }); // 5 секунд
     }
   });
+});
+
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  console.log("Tab activated - Tab:", activeInfo.tabId);
+  restoreBadge(activeInfo.tabId);
+  updateBadgeAndTooltip(activeInfo.tabId);
+});
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete" && tab.active) {
+    console.log("Tab updated - Tab:", tabId);
+    restoreBadge(tabId);
+    updateBadgeAndTooltip(tabId);
+  }
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "autoUpdate") {
     console.log("Alarm triggered");
-    chrome.storage.local.get(["isCounting"], (data) => {
-      if (data.isCounting) {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs[0]) {
-            console.log("Auto-update for tab:", tabs[0].id);
-            updateBadgeAndTooltip(tabs[0].id, false);
-          }
-        });
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0] && tabs[0].id) {
+        console.log("Auto-update for tab:", tabs[0].id);
+        updateBadgeAndTooltip(tabs[0].id);
       }
     });
   }
@@ -107,21 +86,15 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   console.log("Tab removed:", tabId);
-  chrome.storage.local.get(["isCounting"], (data) => {
-    if (data.isCounting) {
-      chrome.storage.local.set({ isCounting: false, lastCount: null });
-      chrome.alarms.clear("autoUpdate");
-    }
-  });
+  chrome.storage.local.set({ lastCount: null });
 });
 
 chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
   console.log("Page changed - Tab:", details.tabId);
-  chrome.storage.local.get(["isCounting"], (data) => {
-    if (data.isCounting) {
-      restoreBadge(details.tabId); // Восстанавливаем значок сразу
-      console.log("Immediate update on navigation");
-      updateBadgeAndTooltip(details.tabId, false); // Обновляем счетчик
+  chrome.tabs.get(details.tabId, (tab) => {
+    if (tab.active) {
+      restoreBadge(details.tabId);
+      updateBadgeAndTooltip(details.tabId);
     }
   });
 });

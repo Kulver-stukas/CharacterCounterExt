@@ -3,12 +3,13 @@
 A Microsoft Edge extension that counts characters on a webpage and displays the total in a tooltip.
 
 ## Features
-- Empty badge in new tabs.
-- First click: Starts counting (2s delay), updates every minute.
-- Second click: Shows immediate count.
-- Auto-updates on page changes within the tab.
-- Badge: "N/A" on restricted pages, otherwise approximate count (e.g., "1k").
-- Tooltip: Exact total and auto status.
+- Automatically counts characters on the active tab (no click required).
+- Updates every 5 seconds for real-time tracking.
+- Preserves badge during page navigation (no reset).
+- Works consistently across all sites, including full page reloads (e.g., FT.com) and SPA navigation (e.g., GitHub, VK.com).
+- Badge: "N/A" on restricted pages (e.g., new tab, chrome://), otherwise approximate count (e.g., "1k").
+- Tooltip: Shows the exact total character count.
+- Lightweight performance with no noticeable impact on browser speed.
 
 ## Installation
 1. Clone or download this repository.
@@ -21,4 +22,5 @@ A Microsoft Edge extension that counts characters on a webpage and displays the 
 - `icon*.png`: Icons for the extension.
 
 ## Credits
-Created by Kulver-stukas with assistance from Grok by xAI.
+- **Created by**: Kulver-stukas (project lead, concept, testing, and release management).
+- **Developed with**: Grok by xAI (code implementation, debugging, and optimization).
